@@ -1,0 +1,7 @@
+{
+  "schemaType": "LAUNCHER",
+  "id": "ingestimator-launcher",
+  "displayName": "Ingestimator",
+  "description": "Estimate the ingest cost per host for your telemetry data",
+  "rootNerdletId": "ingestimator-nerdlet"
+}
