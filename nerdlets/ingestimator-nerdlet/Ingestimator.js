@@ -72,8 +72,7 @@ export default class Ingestimator extends React.PureComponent {
       <tbody>
         <tr>
           <td>APM</td>
-          <td /><td />
-          <td>{this.state.apmHostCount} hosts</td>
+          <td><em>{this.state.apmHostCount} hosts</em></td>
         </tr>
         <CostRow title="Metrics" ingest={this.state.apmMetricsIngest} />
         <CostRow title="Events" ingest={this.state.apmEventsIngest} />
@@ -82,10 +81,8 @@ export default class Ingestimator extends React.PureComponent {
         <CostRow title="Average APM per Host" ingest={this.state.totalApmIngest} hostCount={this.state.apmHostCount} />
 
         <tr>
-          <td>
-            Infrastructure
-            <em>{this.state.infraHostCount} hosts</em>
-          </td>
+          <td>Infrastructure</td>
+          <td><em>{this.state.infraHostCount} hosts</em></td>
         </tr>
         <CostRow title="Host Monitoring" ingest={this.state.infraIngest} />
         <CostRow title="Process Monitoring" ingest={this.state.infraProcessIngest} />
