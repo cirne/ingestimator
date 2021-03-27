@@ -25,16 +25,16 @@ export default class Ingestimator extends React.PureComponent {
     try {
       this.setState({ loading: true })
 
-      const apmMetricsIngest = await this.getIngestRate({ from: 'Metric', where: "newrelic.source ='agent'" })
-      const apmEventsIngest = await this.getIngestRate({ from: APM_EVENTS })
-      const apmTraceIngest = await this.getIngestRate({ from: APM_TRACE_EVENTS })
+      const apmMetricsIngest = await this.querySingleValue({ from: 'Metric', where: "newrelic.source ='agent'" })
+      const apmEventsIngest = await this.querySingleValue({ from: APM_EVENTS })
+      const apmTraceIngest = await this.querySingleValue({ from: APM_TRACE_EVENTS })
       const totalApmIngest = apmEventsIngest + apmMetricsIngest + apmTraceIngest
-      const apmHostCount = await this.getIngestRate({ select: 'uniqueCount(host)', from: 'Transaction' })
+      const apmHostCount = await this.querySingleValue({ select: 'uniqueCount(host)', from: 'Transaction' })
 
-      const infraIngest = await this.getIngestRate({ from: INFRA_EVENTS })
-      const infraProcessIngest = await this.getIngestRate({ from: INFRA_PROCESS_EVENTS })
+      const infraIngest = await this.querySingleValue({ from: INFRA_EVENTS })
+      const infraProcessIngest = await this.querySingleValue({ from: INFRA_PROCESS_EVENTS })
       const totalInfraIngest = infraIngest + infraProcessIngest
-      const infraHostCount = await this.getIngestRate({ select: 'uniqueCount(hostname)', from: 'SystemSample' })
+      const infraHostCount = await this.querySingleValue({ select: 'uniqueCount(hostname)', from: 'SystemSample' })
 
       this.setState({
         apmMetricsIngest, apmEventsIngest, apmTraceIngest, totalApmIngest,
@@ -44,15 +44,15 @@ export default class Ingestimator extends React.PureComponent {
       })
     }
     catch (error) {
-      logger.error("Error", error)
+      logger.error("Error Estimating Ingest Costs", error)
       debugger
     }
   }
 
-  async getIngestRate({ select, from, where }) {
+  async querySingleValue({ select, from, where }) {
     const { accountId, since } = this.props
     const value = await getValue({ select, from, where, accountId, since })
-    logger.log("elvis:", select, from, value)
+    logger.log("Get Value", select || "Ingest Rate", from, value)
     return value
   }
 
@@ -72,6 +72,7 @@ export default class Ingestimator extends React.PureComponent {
       <tbody>
         <tr>
           <td>APM</td>
+          <td /><td />
           <td>{this.state.apmHostCount} hosts</td>
         </tr>
         <CostRow title="Metrics" ingest={this.state.apmMetricsIngest} />
@@ -81,8 +82,10 @@ export default class Ingestimator extends React.PureComponent {
         <CostRow title="Average APM per Host" ingest={this.state.totalApmIngest} hostCount={this.state.apmHostCount} />
 
         <tr>
-          <td>Infrastructure</td>
-          <td>{this.state.infraHostCount} hosts</td>
+          <td>
+            Infrastructure
+            <em>{this.state.infraHostCount} hosts</em>
+          </td>
         </tr>
         <CostRow title="Host Monitoring" ingest={this.state.infraIngest} />
         <CostRow title="Process Monitoring" ingest={this.state.infraProcessIngest} />
