@@ -62,9 +62,9 @@ export class Ingestimator extends React.PureComponent {
     const mobileIngest = consumptionIngest.MobileBytes || 0
     const browserIngest = consumptionIngest.BrowserBytes || 0
     const logsIngest = consumptionIngest.LoggingBytes || 0
-    const otherMetricsIngest = (consumptionIngest.MetricsBytes || 0) - apmMetricsIngest
+    const otherMetricsIngest = Math.max(0, (consumptionIngest.MetricsBytes || 0) - apmMetricsIngest)
     const allIngest = consumptionIngest.TotalBytes
-    const otherIngest = Math.max(allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest, 0)
+    const otherIngest = Math.max(0, allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest)
 
     this.setState({
       apmMetricsIngest, apmEventsIngest, apmTraceIngest, totalApmIngest,
