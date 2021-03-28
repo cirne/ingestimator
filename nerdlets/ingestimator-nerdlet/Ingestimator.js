@@ -15,7 +15,7 @@ export default function NrConsumptionQuery({ since, accountId }) {
 
   return <NrqlQuery accountId={accountId} query={query} formatType="raw">
     {({ loading, data }) => {
-      if (loading || !data) return <Spinner />
+      if (loading || !data) return <Loading percentDone={0} stage="Consumption Actuals" />
       const consumptionIngest = { TotalBytes: data.totalResult.results[0].result }
       data.facets.forEach(facet => {
         consumptionIngest[facet.name] = facet.results[0].result
