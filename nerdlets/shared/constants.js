@@ -8,5 +8,5 @@ export const LOG_EVENTS = ['Log']
 export const ESTIMATED_INGEST = `rate(bytecountestimate(), 1 month)/1e9`
 
 export const WHERE_METRIC_API = "newrelic.source = 'metricAPI'"
-export const WHERE_APM_MTS = "newrelic.source = 'agent'"
+export const WHERE_METRIC_APM = "newrelic.source = 'agent'"
 export const WHERE_PROMETHEUS = "collector.name = 'nri-prometheus'"

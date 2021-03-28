@@ -1,0 +1,43 @@
+table.ingestimator {
+  margin: 12px;
+  thead {
+    th {
+      font-weight: 800;
+      text-transform: none;
+      background-color: #e8e8e8;
+    }
+  }
+  tbody {
+    td.right {
+      text-align: right;
+    }
+
+    td.title {
+      font-weight: 500;
+    }
+
+    tr.section {
+      border-top: 1px solid #ddd
+    }
+
+    tr.detail {
+      td {
+        color: #888;
+      }
+    }
+
+    tr.subTotal {
+      border-top: 1px double #eee;
+    }
+
+    tr.grandTotal {
+      border-top: 1px double #ccc;
+      border-width: 3px;
+      td {
+        font-weight: 800;
+        background-color: #e8e8e8;
+      }
+    }
+
+  }
+}

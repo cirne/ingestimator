@@ -40,14 +40,20 @@ We can normalize this out to a rate of 1 month (in NRQL, `1 month` is 30 days) b
 FROM Log SELECT rate(bytecountestimate()) SINCE 7 days ago
 ```
 
-## Ahh... but... Metrics.
+## APM and Metrics.
 When determining an "apples to apples" comparison of APM costs, we need to include the set of Metric data
-that is coming from our APM agents, and also add other event data that our agents generate, such as `Transaction`,
+that is coming from our APM agents. We can see that metric data by querying:
+```
+FROM Metric select bytecountestimate() where newrelic.source = 'agent'
+```
+
+
+To this metric data also add other event data that our agents generate, such as `Transaction`,
 `TransactionError`, `Span`, etc. So APM cost is comprised of Metrics, Traces and Events that come from our APM
 agents, or OpenTelemetry agents.
 
-But there are other sources of Metrics data, such as our Prometheus integration. So we capture the rest of those
-metrics separately.
+There are other sources of Metric Data. For example, you can forward your prometheus metric data into New Relic
+Telemetry Data Platform via our Metrics API. So we measure that separately.
 
 ## Disclaimers
 This feels really weird coming from the CEO, but I wrote this app on a weekend, and while I think the logic is mostly

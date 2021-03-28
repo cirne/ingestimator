@@ -37,5 +37,8 @@ export function estimatedCost(value, hostCount) {
   if (hostCount && hostCount > 0) {
     value = value / hostCount
   }
-  return `$${Math.round(value * 25) / 100} ${suffix}`
+  const cost = Math.round(value * 25) / 100
+  const dollars = cost.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+  return `${dollars} ${suffix}`
 }
