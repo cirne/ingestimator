@@ -4,9 +4,9 @@ import {
   APM_EVENTS, APM_TRACE_EVENTS,
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
   MOBILE_EVENTS, BROWSER_EVENTS,
-  WHERE_METRIC_APM, WHERE_METRIC_API, WHERE_LOGS,
+  WHERE_METRIC_APM, WHERE_OTHER_METRIC, WHERE_LOGS,
   ESTIMATED_INGEST_GB,
-  ESTIMATED_INGEST
+
 } from '../shared/constants'
 
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
@@ -46,7 +46,7 @@ export default class Ingestimator extends React.PureComponent {
     const mobileIngest = await this.querySingleValue({ title: "Mobile", from: MOBILE_EVENTS })
     const browserIngest = await this.querySingleValue({ title: "Browser", from: BROWSER_EVENTS })
     const logsIngest = await this.querySingleValue({ title: "Logs", from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
-    const otherMetricsIngest = await this.querySingleValue({ title: "Metrics", from: 'Metric', where: WHERE_METRIC_API })
+    const otherMetricsIngest = await this.querySingleValue({ title: "Metrics", from: 'Metric', where: WHERE_OTHER_METRIC })
 
     const allIngest = await this.querySingleValue({ title: "Other", from: 'NrConsumption', select: ESTIMATED_INGEST_GB })
     const otherIngest = Math.max(allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest, 0)
@@ -114,7 +114,7 @@ export default class Ingestimator extends React.PureComponent {
         <IngestRow className="section" sectionTitle="Mobile" ingest={this.state.mobileIngest} />
         <IngestRow className="section" sectionTitle="Browser" ingest={this.state.browserIngest} />
         <IngestRow className="section" sectionTitle="Logs" ingest={this.state.logsIngest} />
-        <IngestRow className="section" sectionTitle="Metrics via API" ingest={this.state.otherMetricsIngest} />
+        <IngestRow className="section" sectionTitle="Metrics (non APM/Infra)" ingest={this.state.otherMetricsIngest} />
         <IngestRow className="section" sectionTitle="All Other Ingest" ingest={this.state.otherIngest} />
         <IngestRow className="grandTotal" sectionTitle="Grand Total Ingest" ingest={this.state.allIngest} />
       </tbody>
