@@ -12,6 +12,7 @@ cost when compared to legacy (host based) pricing models. This allows you to:
 
 - make an apples to apples comparison of New Relic One telemetry pricing with other legacy pricing models
 - estimate the additional cost of deploying New Relic more broadly (on more applications, hosts, etc.)
+- estimate how many host of APM or Infrastrucutre you can monitor with New Relic's free tier (100 GB per month free)
 
 Since every application and environment is unique, it's hard for New Relic to give an accurate estimate
 of ingest cost per host for your application and environment. That's where **Ingestimator** comes in.

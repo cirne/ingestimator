@@ -13,7 +13,6 @@ export async function getValue({ select, from, where, accountId, since }) {
 
   const result = await NrqlQuery.query({ accountId, query: nrql, formatType: 'raw' })
   if (!result.data?.results && result.error) {
-    debugger
     if (result.error.match(/No events found/i)) {
       return 0
     }
@@ -26,19 +25,17 @@ export async function getValue({ select, from, where, accountId, since }) {
 
 
 export function ingestRate(value, hostCount) {
-  let suffix = "GB/mo"
+  const suffix = "GB/mo"
   if (hostCount && hostCount > 0) {
     value = value / hostCount
-    suffix = "GB/host/mo"
   }
   return `${Math.round(value)} ${suffix}`
 }
 
 export function estimatedCost(value, hostCount) {
-  let suffix = "/mo"
+  const suffix = "/mo"
   if (hostCount && hostCount > 0) {
     value = value / hostCount
-    suffix = "/host/mo"
   }
   return `$${Math.round(value * 25) / 100} ${suffix}`
 }
