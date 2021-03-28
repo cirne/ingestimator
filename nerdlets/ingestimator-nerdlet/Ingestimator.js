@@ -142,11 +142,11 @@ function ClampedTimeRangeNotification({ since, metricsIngest }) {
     <h3>Shortened Time Range</h3>
     <p>
       In order to estimate APM Metrics Ingest, <strong>Ingestimator</strong> must inspect
-      every raw piece of metric data ingested in your account over the specified time range.
+      every byte of metric data ingested in your account over the specified time range.
     </p><p>
       This account has an estimated monthly metrics ingest of {ingestRate(metricsIngest)}, which is too
-      much to analyize over very long time ranges. As a result the time range is clamped
-      to {since}
+      much to analyze over very long time ranges. As a result the time range is clamped
+      to {since}.
     </p>
   </div>
 }
