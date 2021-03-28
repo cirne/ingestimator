@@ -40,9 +40,9 @@ We can normalize this out to a rate of 1 month (in NRQL, `1 month` is 30 days) b
 FROM Log SELECT rate(bytecountestimate()) SINCE 7 days ago
 ```
 
-## APM and Metrics.
-When determining an "apples to apples" comparison of APM costs, we need to include the set of Metric data
-that is coming from our APM agents. We can see that metric data by querying:
+## Metrics (APM and Otherwise)
+When determining an "apples to apples" comparison of APM costs to host-based pricing modesl, we need to include the set of Metric data
+that is coming from our APM agents as part of the APM cost per host. We can see that metric data by querying:
 ```
 FROM Metric select bytecountestimate() where newrelic.source = 'agent'
 ```
@@ -52,12 +52,18 @@ To this metric data also add other event data that our agents generate, such as 
 `TransactionError`, `Span`, etc. So APM cost is comprised of Metrics, Traces and Events that come from our APM
 agents, or OpenTelemetry agents.
 
-There are other sources of Metric Data. For example, you can forward your prometheus metric data into New Relic
+Infrastructure is its own thing. New Relic agents report Infrastructure
+telemetry as `Sample` events (e.g. `SystemSample`, `ProcessSample`, etc) which
+allow for unlimited cardinality. So we don't have any "Metric" data to 
+allocate to the cost of Infrastructure.
+
+However, there are other sources of Metric Data that come from. For example, you can forward your prometheus metric data into New Relic
 Telemetry Data Platform via our Metrics API. So we measure that separately.
 
 ## Disclaimers
-This feels really weird coming from the CEO, but I wrote this app on a weekend, and while I think the logic is mostly
+I wrote this app on a weekend, and while I think the logic is mostly
 accurate, this data is not going to precisely match the data ingest that New Relic bills on. You can see that precise
-data in your account by querying `NrConsumption` events or selecting *View your usage* in the global drop down menu at the
-top right of New Relic one. Note this `NrConsumption` data, while precise, will unfortunately not break down with the same
-level of preicison as this application. That's why I wrote this.
+data in your account by querying `NrConsumption` events or selecting **View your usage** in the global drop down menu at the
+top right of New Relic one. 
+
+Note that the `NrConsumption` data, while precise, will unfortunately not break down with the same level of detail or organizwed as intuitively as the data reported by **Ingestimator**. That's why I wrote this app.
