@@ -4,9 +4,10 @@ import {
   APM_EVENTS, APM_TRACE_EVENTS,
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
   MOBILE_EVENTS, BROWSER_EVENTS,
-  WHERE_METRIC_APM, WHERE_OTHER_METRIC, WHERE_LOGS,
-  ESTIMATED_INGEST_GB,
-
+  METRIC_EVENTS,
+  WHERE_METRIC_APM, WHERE_OTHER_METRIC,
+  WHERE_LOGS_NRCONSUMPTION,
+  ESTIMATED_INGEST_NRCONSUMPTION
 } from '../shared/constants'
 
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
@@ -32,7 +33,7 @@ export default class Ingestimator extends React.PureComponent {
   async load() {
     await this.setState({ loading: true, step: 0 })
 
-    const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", from: 'Metric', where: WHERE_METRIC_APM })
+    const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", METRIC_EVENTS, where: WHERE_METRIC_APM })
     const apmEventsIngest = await this.querySingleValue({ title: "APM Events", from: APM_EVENTS })
     const apmTraceIngest = await this.querySingleValue({ title: "APM Traces", from: APM_TRACE_EVENTS })
     const totalApmIngest = apmEventsIngest + apmMetricsIngest + apmTraceIngest
@@ -45,10 +46,9 @@ export default class Ingestimator extends React.PureComponent {
 
     const mobileIngest = await this.querySingleValue({ title: "Mobile", from: MOBILE_EVENTS })
     const browserIngest = await this.querySingleValue({ title: "Browser", from: BROWSER_EVENTS })
-    const logsIngest = await this.querySingleValue({ title: "Logs", from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
-    const otherMetricsIngest = await this.querySingleValue({ title: "Metrics", from: 'Metric', where: WHERE_OTHER_METRIC })
-
-    const allIngest = await this.querySingleValue({ title: "Other", from: 'NrConsumption', select: ESTIMATED_INGEST_GB })
+    const logsIngest = await this.queryNrConsumption({ title: "Logs", where: WHERE_LOGS_NRCONSUMPTION })
+    const otherMetricsIngest = await this.querySingleValue({ title: "Metrics", from: METRIC_EVENTS, where: WHERE_OTHER_METRIC })
+    const allIngest = await this.queryNrConsumption({ title: "Other" })
     const otherIngest = Math.max(allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest, 0)
 
     this.setState({
@@ -59,6 +59,13 @@ export default class Ingestimator extends React.PureComponent {
       otherIngest, allIngest,
       loading: false
     })
+  }
+
+  async queryNrConsumption({ title, where }) {
+    const select = ESTIMATED_INGEST_NRCONSUMPTION
+    const from = 'NrConsumption'
+    logger.log("Query NRQL Consumption", title, select, from, where)
+    return await this.querySingleValue({ title, select, from, where })
   }
 
   async querySingleValue({ title, select, from, where }) {
