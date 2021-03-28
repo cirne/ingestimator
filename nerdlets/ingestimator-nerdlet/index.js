@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { NerdletStateContext, PlatformStateContext, nerdlet } from 'nr1'
-import Ingestimator from './Ingestimator';
+import Preflight from './Preflight'
 
 const HOUR = 1000 * 60 * 60
 const DAY = HOUR * 24
-export default class IngestimatorNerdletNerdlet extends React.Component {
+export default class IngestimatorNerdlet extends React.Component {
   componentDidMount() {
     nerdlet.setConfig({
       accountPicker: true,
@@ -31,7 +31,7 @@ export default class IngestimatorNerdletNerdlet extends React.Component {
 
             const since = `${timeRange.duration / HOUR} hours ago`
 
-            return <Ingestimator accountId={accountId} since={since} />
+            return <Preflight accountId={accountId} since={since} />
           }}
         </PlatformStateContext.Consumer>
       )}

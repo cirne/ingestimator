@@ -1,5 +1,4 @@
-table.ingestimator {
-  margin: 12px;
+table.ingestimator-table {
   thead {
     th {
       font-weight: 800;
@@ -39,5 +38,18 @@ table.ingestimator {
       }
     }
 
+  }
+}
+
+.notice {
+  width: 90%;
+  border: 1px solid #00F;
+  background-color: #def;
+  padding: 12px;
+  margin-bottom: 12px;
+  
+
+  h2 p {
+    margin-bottom: 1em;
   }
 }

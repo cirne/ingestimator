@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spinner, logger, NrqlQuery } from 'nr1'
+import { logger } from 'nr1'
 import {
   APM_EVENTS, APM_TRACE_EVENTS,
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
@@ -8,26 +8,10 @@ import {
 } from '../shared/constants'
 
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
-
-export default function NrConsumptionQuery({ since, accountId }) {
-  const query = `FROM NrConsumption SELECT rate(sum(GigabytesIngested), 1 month) ` +
-    `WHERE productLine = 'DataPlatform' FACET usageMetric SINCE ${since} LIMIT 20`
-
-  return <NrqlQuery accountId={accountId} query={query} formatType="raw">
-    {({ loading, data }) => {
-      if (loading || !data) return <Loading percentDone={0} stage="Consumption Actuals" />
-      const consumptionIngest = { TotalBytes: data.totalResult.results[0].result }
-      data.facets.forEach(facet => {
-        consumptionIngest[facet.name] = facet.results[0].result
-      })
-
-      return <Ingestimator consumptionIngest={consumptionIngest} accountId={accountId} since={since} />
-    }}
-  </NrqlQuery>
-}
+import { Loading } from './Loading'
 
 const STEP_COUNT = 8
-export class Ingestimator extends React.PureComponent {
+export default class Ingestimator extends React.PureComponent {
 
   state = { loading: "true", step: 0 }
 
@@ -97,44 +81,48 @@ export class Ingestimator extends React.PureComponent {
     const percentDone = Math.round(step * 100 / STEP_COUNT)
     if (loading) return <Loading percentDone={percentDone} stage={stage} />
 
-    return <table className="ingestimator">
-      <thead>
-        <tr>
-          <th colSpan={2}>Category</th>
-          <th>Data Ingest per Month</th>
-          <th>Estimated Cost per Month</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr className="section">
-          <td>APM</td>
-          <td><em>{this.state.apmHostCount} hosts</em></td>
-          <td colSpan={2} />
-        </tr>
-        <IngestRow className="detail" title="Metrics" ingest={this.state.apmMetricsIngest} />
-        <IngestRow className="detail" title="Events" ingest={this.state.apmEventsIngest} />
-        <IngestRow className="detail" title="Traces" ingest={this.state.apmTraceIngest} />
-        <IngestRow className="subTotal" title="Total APM" ingest={this.state.totalApmIngest} />
-        <IngestRow title="Average APM per Host" ingest={this.state.totalApmIngest} hostCount={this.state.apmHostCount} />
+    const { clampedTimeRange, since, consumptionIngest } = this.props
+    return <div className="ingestimator">
+      {clampedTimeRange && <ClampedTimeRangeNotification since={since} metricsIngest={consumptionIngest.MetricsBytes} />}
+      <table className="ingestimator-table">
+        <thead>
+          <tr>
+            <th colSpan={2}>Category</th>
+            <th>Data Ingest per Month</th>
+            <th>Estimated Cost per Month</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="section">
+            <td>APM</td>
+            <td><em>{this.state.apmHostCount} hosts</em></td>
+            <td colSpan={2} />
+          </tr>
+          <IngestRow className="detail" title="Metrics" ingest={this.state.apmMetricsIngest} />
+          <IngestRow className="detail" title="Events" ingest={this.state.apmEventsIngest} />
+          <IngestRow className="detail" title="Traces" ingest={this.state.apmTraceIngest} />
+          <IngestRow className="subTotal" title="Total APM" ingest={this.state.totalApmIngest} />
+          <IngestRow title="Average APM per Host" ingest={this.state.totalApmIngest} hostCount={this.state.apmHostCount} />
 
-        <tr className="section">
-          <td>Infrastructure</td>
-          <td><em>{this.state.infraHostCount} hosts</em></td>
-          <td colSpan={2} />
-        </tr>
-        <IngestRow className="detail" title="Host Monitoring" ingest={this.state.infraIngest} />
-        <IngestRow className="detail" title="Process Monitoring" ingest={this.state.infraProcessIngest} />
-        <IngestRow className="subTotal" title="Total Infrastructure" ingest={this.state.totalInfraIngest} />
-        <IngestRow title="Average Infrastructure per Host" ingest={this.state.totalInfraIngest} hostCount={this.state.infraHostCount} />
+          <tr className="section">
+            <td>Infrastructure</td>
+            <td><em>{this.state.infraHostCount} hosts</em></td>
+            <td colSpan={2} />
+          </tr>
+          <IngestRow className="detail" title="Host Monitoring" ingest={this.state.infraIngest} />
+          <IngestRow className="detail" title="Process Monitoring" ingest={this.state.infraProcessIngest} />
+          <IngestRow className="subTotal" title="Total Infrastructure" ingest={this.state.totalInfraIngest} />
+          <IngestRow title="Average Infrastructure per Host" ingest={this.state.totalInfraIngest} hostCount={this.state.infraHostCount} />
 
-        <IngestRow className="section" sectionTitle="Mobile" ingest={this.state.mobileIngest} />
-        <IngestRow className="section" sectionTitle="Browser" ingest={this.state.browserIngest} />
-        <IngestRow className="section" sectionTitle="Logs" ingest={this.state.logsIngest} />
-        <IngestRow className="section" sectionTitle="Metrics (non APM/Infra)" ingest={this.state.otherMetricsIngest} />
-        <IngestRow className="section" sectionTitle="All Other Ingest" ingest={this.state.otherIngest} />
-        <IngestRow className="grandTotal" sectionTitle="Grand Total Ingest" ingest={this.state.allIngest} />
-      </tbody>
-    </table>
+          <IngestRow className="section" sectionTitle="Mobile" ingest={this.state.mobileIngest} />
+          <IngestRow className="section" sectionTitle="Browser" ingest={this.state.browserIngest} />
+          <IngestRow className="section" sectionTitle="Logs" ingest={this.state.logsIngest} />
+          <IngestRow className="section" sectionTitle="Metrics (non APM/Infra)" ingest={this.state.otherMetricsIngest} />
+          <IngestRow className="section" sectionTitle="All Other Ingest" ingest={this.state.otherIngest} />
+          <IngestRow className="grandTotal" sectionTitle="Grand Total Ingest" ingest={this.state.allIngest} />
+        </tbody>
+      </table>
+    </div>
   }
 }
 
@@ -147,10 +135,18 @@ function IngestRow({ sectionTitle, title, ingest, hostCount, className }) {
   </tr>
 }
 
-function Loading({ percentDone, stage }) {
-  return <div className="loading">
-    <p>Crunching through all that telemetry data...</p>
-    <p>{stage} ({percentDone}%)</p>
-    <Spinner />
+
+
+function ClampedTimeRangeNotification({ since, metricsIngest }) {
+  return <div className="notice">
+    <h3>Shortened Time Range</h3>
+    <p>
+      In order to estimate APM Metrics Ingest, <strong>Ingestimator</strong> must inspect
+      every raw piece of metric data ingested in your account over the specified time range.
+    </p><p>
+      This account has an estimated monthly metrics ingest of {ingestRate(metricsIngest)}, which is too
+      much to analyize over very long time ranges. As a result the time range is clamped
+      to {since}
+    </p>
   </div>
 }
