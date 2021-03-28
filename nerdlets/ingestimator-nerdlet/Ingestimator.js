@@ -1,19 +1,33 @@
 import React from 'react'
-import { Spinner, logger } from 'nr1'
+import { Spinner, logger, NrqlQuery } from 'nr1'
 import {
   APM_EVENTS, APM_TRACE_EVENTS,
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
-  MOBILE_EVENTS, BROWSER_EVENTS,
   METRIC_EVENTS,
-  WHERE_METRIC_APM, WHERE_OTHER_METRIC,
-  WHERE_LOGS_NRCONSUMPTION,
-  ESTIMATED_INGEST_NRCONSUMPTION
+  WHERE_METRIC_APM,
 } from '../shared/constants'
 
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
 
-const STEP_COUNT = 12
-export default class Ingestimator extends React.PureComponent {
+export default function NrConsumptionQuery({ since, accountId }) {
+  const query = `FROM NrConsumption SELECT rate(sum(GigabytesIngested), 1 month) ` +
+    `WHERE productLine = 'DataPlatform' FACET usageMetric SINCE ${since} LIMIT 20`
+
+  return <NrqlQuery accountId={accountId} query={query} formatType="raw">
+    {({ loading, data }) => {
+      if (loading || !data) return <Spinner />
+      const consumptionIngest = { TotalBytes: data.totalResult.results[0].result }
+      data.facets.forEach(facet => {
+        consumptionIngest[facet.name] = facet.results[0].result
+      })
+
+      return <Ingestimator consumptionIngest={consumptionIngest} accountId={accountId} since={since} />
+    }}
+  </NrqlQuery>
+}
+
+const STEP_COUNT = 8
+export class Ingestimator extends React.PureComponent {
 
   state = { loading: "true", step: 0 }
 
@@ -31,9 +45,10 @@ export default class Ingestimator extends React.PureComponent {
   }
 
   async load() {
+    const { consumptionIngest } = this.props
     await this.setState({ loading: true, step: 0 })
 
-    const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", METRIC_EVENTS, where: WHERE_METRIC_APM })
+    const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", from: METRIC_EVENTS, where: WHERE_METRIC_APM })
     const apmEventsIngest = await this.querySingleValue({ title: "APM Events", from: APM_EVENTS })
     const apmTraceIngest = await this.querySingleValue({ title: "APM Traces", from: APM_TRACE_EVENTS })
     const totalApmIngest = apmEventsIngest + apmMetricsIngest + apmTraceIngest
@@ -44,11 +59,11 @@ export default class Ingestimator extends React.PureComponent {
     const totalInfraIngest = infraIngest + infraProcessIngest
     const infraHostCount = await this.querySingleValue({ title: "Infra Hosts", select: 'uniqueCount(hostname)', from: INFRA_EVENTS[0] })
 
-    const mobileIngest = await this.querySingleValue({ title: "Mobile", from: MOBILE_EVENTS })
-    const browserIngest = await this.querySingleValue({ title: "Browser", from: BROWSER_EVENTS })
-    const logsIngest = await this.queryNrConsumption({ title: "Logs", where: WHERE_LOGS_NRCONSUMPTION })
-    const otherMetricsIngest = await this.querySingleValue({ title: "Metrics", from: METRIC_EVENTS, where: WHERE_OTHER_METRIC })
-    const allIngest = await this.queryNrConsumption({ title: "Other" })
+    const mobileIngest = consumptionIngest.MobileBytes || 0
+    const browserIngest = consumptionIngest.BrowserBytes || 0
+    const logsIngest = consumptionIngest.LoggingBytes || 0
+    const otherMetricsIngest = (consumptionIngest.MetricsBytes || 0) - apmMetricsIngest
+    const allIngest = consumptionIngest.TotalBytes
     const otherIngest = Math.max(allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest, 0)
 
     this.setState({
@@ -61,18 +76,12 @@ export default class Ingestimator extends React.PureComponent {
     })
   }
 
-  async queryNrConsumption({ title, where }) {
-    const select = ESTIMATED_INGEST_NRCONSUMPTION
-    const from = 'NrConsumption'
-    logger.log("Query NRQL Consumption", title, select, from, where)
-    return await this.querySingleValue({ title, select, from, where })
-  }
-
   async querySingleValue({ title, select, from, where }) {
     this.setState({ step: this.state.step + 1, stage: title })
 
     try {
       const { accountId, since } = this.props
+      logger.log("Get Value", select || "Ingest Rate", from)
       const value = await getValue({ select, from, where, accountId, since })
       logger.log("Get Value", select || "Ingest Rate", from, value)
       return value

@@ -8,8 +8,7 @@ export const INFRA_PROCESS_EVENTS = ['ProcessSample']
 export const METRIC_EVENTS = ['Metric', 'MetricRaw']
 
 // select clausess
-export const ESTIMATED_INGEST = `rate(bytecountestimate(), 1 month)/1e9`
-export const ESTIMATED_INGEST_NRCONSUMPTION = `rate(sum(GigabytesIngested), 1 month)`
+export const ESTIMATED_INGEST_GB = `rate(bytecountestimate(), 1 month)/1e9`
 
 // where clauses for metrics queries
 export const WHERE_METRIC_API = "newrelic.source = 'metricAPI'"

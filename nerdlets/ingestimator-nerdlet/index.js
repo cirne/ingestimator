@@ -11,7 +11,7 @@ export default class IngestimatorNerdletNerdlet extends React.Component {
       accountPicker: true,
       timePicker: true,
       timePickerRanges: [
-        // { label: '3 hours', offset: 3 * HOUR },
+        { label: '3 hours', offset: 3 * HOUR },
         { label: '24 hours', offset: DAY },
         { label: '7 days', offset: 7 * DAY },
         { label: '30 days', offset: 30 * DAY },

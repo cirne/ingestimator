@@ -1,8 +1,8 @@
 import { NrqlQuery } from 'nr1'
-import { ESTIMATED_INGEST } from './constants'
+import { ESTIMATED_INGEST_GB } from './constants'
 
 export async function getValue({ select, from, where, accountId, since }) {
-  select = select || ESTIMATED_INGEST
+  select = select || ESTIMATED_INGEST_GB
 
   if (Array.isArray(from)) {
     from = from.join(', ')
