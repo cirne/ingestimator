@@ -145,8 +145,10 @@ function ClampedTimeRangeNotification({ since, metricsIngest }) {
       every byte of metric data ingested in your account over the specified time range.
     </p><p>
       This account has an estimated monthly metrics ingest of {ingestRate(metricsIngest)}, which is too
-      much to analyze over very long time ranges. As a result the time range is clamped
-      to {since}.
+      much to analyze over very long time ranges.
+    </p><p>
+      As a result, the time range used to estimate your APM ingest rate is extrapolated
+      from telemetry ingested since {since}.
     </p>
   </div>
 }
