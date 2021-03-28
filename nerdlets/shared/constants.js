@@ -9,6 +9,6 @@ export const ESTIMATED_INGEST = `rate(bytecountestimate(), 1 month)/1e9`
 export const ESTIMATED_INGEST_GB = `rate(sum(GigabytesIngested), 1 month)`
 
 export const WHERE_METRIC_API = "newrelic.source = 'metricAPI'"
+export const WHERE_OTHER_METRIC = "newrelic.source != 'agent'"
 export const WHERE_METRIC_APM = "newrelic.source = 'agent'"
-export const WHERE_PROMETHEUS = "collector.name = 'nri-prometheus'"
 export const WHERE_LOGS = "usageMetric = 'LoggingBytes'"
