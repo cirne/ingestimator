@@ -25,8 +25,12 @@ export default class IngestimatorNerdletNerdlet extends React.Component {
       {(nerdletState) => (
         <PlatformStateContext.Consumer>
           {(platformState) => {
-            const since = `${platformState.timeRange.duration / HOUR} hours ago`
-            const { accountId } = platformState
+            const { timeRange, accountId } = platformState
+            if ((timeRange?.duration || 0) < 3 * HOUR || !accountId) {
+              return ""
+            }
+
+            const since = `${timeRange.duration / HOUR} hours ago`
 
             return <Ingestimator accountId={accountId} since={since} />
           }}
