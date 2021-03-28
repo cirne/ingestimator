@@ -3,15 +3,17 @@ import { Spinner, logger } from 'nr1'
 import {
   APM_EVENTS, APM_TRACE_EVENTS,
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
-  MOBILE_EVENTS, BROWSER_EVENTS, LOG_EVENTS,
-  WHERE_METRIC_APM, WHERE_METRIC_API
+  MOBILE_EVENTS, BROWSER_EVENTS,
+  WHERE_METRIC_APM, WHERE_METRIC_API, WHERE_LOGS,
+  ESTIMATED_INGEST_GB
 } from '../shared/constants'
 
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
 
+const STEP_COUNT = 12
 export default class Ingestimator extends React.PureComponent {
 
-  state = { loading: "true" }
+  state = { loading: "true", step: 0 }
 
   async componentDidMount() {
     this.load()
@@ -27,7 +29,7 @@ export default class Ingestimator extends React.PureComponent {
   }
 
   async load() {
-    this.setState({ loading: true })
+    await this.setState({ loading: true, step: 0 })
 
     const apmMetricsIngest = await this.querySingleValue({ from: 'Metric', where: WHERE_METRIC_APM })
     const apmEventsIngest = await this.querySingleValue({ from: APM_EVENTS })
@@ -42,10 +44,10 @@ export default class Ingestimator extends React.PureComponent {
 
     const mobileIngest = await this.querySingleValue({ from: MOBILE_EVENTS })
     const browserIngest = await this.querySingleValue({ from: BROWSER_EVENTS })
-    const logsIngest = await this.querySingleValue({ from: LOG_EVENTS })
+    const logsIngest = await this.querySingleValue({ from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
     const otherMetricsIngest = await this.querySingleValue({ from: 'Metric', where: WHERE_METRIC_API })
 
-    const allIngest = await this.querySingleValue({ from: 'NrConsumption', select: 'rate(sum(GigabytesIngested), 1 month)' })
+    const allIngest = await this.querySingleValue({ from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
     const otherIngest = Math.max(allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest, 0)
 
     this.setState({
@@ -59,6 +61,8 @@ export default class Ingestimator extends React.PureComponent {
   }
 
   async querySingleValue({ select, from, where }) {
+    this.setState({ step: this.state.step + 1 })
+
     try {
       const { accountId, since } = this.props
       const value = await getValue({ select, from, where, accountId, since })
@@ -72,8 +76,9 @@ export default class Ingestimator extends React.PureComponent {
   }
 
   render() {
-    const { loading } = this.state
-    if (loading) return <Spinner />
+    const { loading, step } = this.state
+    const percentDone = Math.round(step * 100 / STEP_COUNT)
+    if (loading) return <Loading percentDone={percentDone} />
 
     return <table className="ingestimator">
       <thead>
@@ -123,4 +128,11 @@ function IngestRow({ sectionTitle, title, ingest, hostCount, className }) {
     <td className="right">{ingestRate(ingest, hostCount)}</td>
     <td className="right">{estimatedCost(ingest, hostCount)}</td>
   </tr>
+}
+
+function Loading({ percentDone }) {
+  return <div className="loading">
+    <p>Crunching through all that telemetry data... {percentDone}%</p>
+    <Spinner />
+  </div>
 }

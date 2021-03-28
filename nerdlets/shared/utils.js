@@ -25,11 +25,10 @@ export async function getValue({ select, from, where, accountId, since }) {
 
 
 export function ingestRate(value, hostCount) {
-  const suffix = "GB/mo"
   if (hostCount && hostCount > 0) {
     value = value / hostCount
   }
-  return `${Math.round(value)} ${suffix}`
+  return `${gigabytes(value)} /mo`
 }
 
 export function estimatedCost(value, hostCount) {
@@ -41,4 +40,25 @@ export function estimatedCost(value, hostCount) {
   const dollars = cost.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
   return `${dollars} ${suffix}`
+}
+
+
+export function gigabytes(value, isDelta) {
+  value = value * 1e9
+  const plus = isDelta && value > 0 ? "+" : ""
+  let divisor, suffix
+  if (Math.abs(value) > 1e15) {
+    divisor = 1e15
+    suffix = 'PB'
+  }
+  else if (Math.abs(value) > 1e12) {
+    divisor = 1e12
+    suffix = 'TB'
+  }
+  else {
+    divisor = 1e9
+    suffix = 'GB'
+  }
+
+  return `${plus}${Math.round(value / divisor * 10) / 10} ${suffix}`
 }
