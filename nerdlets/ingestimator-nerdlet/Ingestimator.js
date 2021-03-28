@@ -5,7 +5,8 @@ import {
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
   MOBILE_EVENTS, BROWSER_EVENTS,
   WHERE_METRIC_APM, WHERE_METRIC_API, WHERE_LOGS,
-  ESTIMATED_INGEST_GB
+  ESTIMATED_INGEST_GB,
+  ESTIMATED_INGEST
 } from '../shared/constants'
 
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
@@ -31,23 +32,23 @@ export default class Ingestimator extends React.PureComponent {
   async load() {
     await this.setState({ loading: true, step: 0 })
 
-    const apmMetricsIngest = await this.querySingleValue({ from: 'Metric', where: WHERE_METRIC_APM })
-    const apmEventsIngest = await this.querySingleValue({ from: APM_EVENTS })
-    const apmTraceIngest = await this.querySingleValue({ from: APM_TRACE_EVENTS })
+    const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", from: 'Metric', where: WHERE_METRIC_APM })
+    const apmEventsIngest = await this.querySingleValue({ title: "APM Events", from: APM_EVENTS })
+    const apmTraceIngest = await this.querySingleValue({ title: "APM Traces", from: APM_TRACE_EVENTS })
     const totalApmIngest = apmEventsIngest + apmMetricsIngest + apmTraceIngest
-    const apmHostCount = await this.querySingleValue({ select: 'uniqueCount(host)', from: APM_EVENTS[0] })
+    const apmHostCount = await this.querySingleValue({ title: "APM Hosts", select: 'uniqueCount(host)', from: APM_EVENTS[0] })
 
-    const infraIngest = await this.querySingleValue({ from: INFRA_EVENTS })
-    const infraProcessIngest = await this.querySingleValue({ from: INFRA_PROCESS_EVENTS })
+    const infraIngest = await this.querySingleValue({ title: "Infra", from: INFRA_EVENTS })
+    const infraProcessIngest = await this.querySingleValue({ title: "Infra Process", from: INFRA_PROCESS_EVENTS })
     const totalInfraIngest = infraIngest + infraProcessIngest
-    const infraHostCount = await this.querySingleValue({ select: 'uniqueCount(hostname)', from: INFRA_EVENTS[0] })
+    const infraHostCount = await this.querySingleValue({ title: "Infra Hosts", select: 'uniqueCount(hostname)', from: INFRA_EVENTS[0] })
 
-    const mobileIngest = await this.querySingleValue({ from: MOBILE_EVENTS })
-    const browserIngest = await this.querySingleValue({ from: BROWSER_EVENTS })
-    const logsIngest = await this.querySingleValue({ from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
-    const otherMetricsIngest = await this.querySingleValue({ from: 'Metric', where: WHERE_METRIC_API })
+    const mobileIngest = await this.querySingleValue({ title: "Mobile", from: MOBILE_EVENTS })
+    const browserIngest = await this.querySingleValue({ title: "Browser", from: BROWSER_EVENTS })
+    const logsIngest = await this.querySingleValue({ title: "Logs", from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
+    const otherMetricsIngest = await this.querySingleValue({ title: "Metrics", from: 'Metric', where: WHERE_METRIC_API })
 
-    const allIngest = await this.querySingleValue({ from: 'NrConsumption', select: ESTIMATED_INGEST_GB, where: WHERE_LOGS })
+    const allIngest = await this.querySingleValue({ title: "Other", from: 'NrConsumption', select: ESTIMATED_INGEST_GB })
     const otherIngest = Math.max(allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest, 0)
 
     this.setState({
@@ -60,8 +61,8 @@ export default class Ingestimator extends React.PureComponent {
     })
   }
 
-  async querySingleValue({ select, from, where }) {
-    this.setState({ step: this.state.step + 1 })
+  async querySingleValue({ title, select, from, where }) {
+    this.setState({ step: this.state.step + 1, stage: title })
 
     try {
       const { accountId, since } = this.props
@@ -76,9 +77,9 @@ export default class Ingestimator extends React.PureComponent {
   }
 
   render() {
-    const { loading, step } = this.state
+    const { loading, step, stage } = this.state
     const percentDone = Math.round(step * 100 / STEP_COUNT)
-    if (loading) return <Loading percentDone={percentDone} />
+    if (loading) return <Loading percentDone={percentDone} stage={stage} />
 
     return <table className="ingestimator">
       <thead>
@@ -130,9 +131,10 @@ function IngestRow({ sectionTitle, title, ingest, hostCount, className }) {
   </tr>
 }
 
-function Loading({ percentDone }) {
+function Loading({ percentDone, stage }) {
   return <div className="loading">
-    <p>Crunching through all that telemetry data... {percentDone}%</p>
+    <p>Crunching through all that telemetry data...</p>
+    <p>{stage} ({percentDone}%)</p>
     <Spinner />
   </div>
 }

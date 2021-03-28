@@ -1,10 +1,10 @@
 @import "../shared/styles.scss";
 
 .loading {
+  margin-top: 300px;
   width: 100%;
   p {
-    margin-top: 300px;
     text-align: center;
-    margin-bottom: 60px;
+    margin: 1em;
   } 
 }
