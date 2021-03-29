@@ -1,8 +1,8 @@
 import React from 'react'
 import { logger, Link, navigation } from 'nr1'
 import {
-  APM_EVENTS, APM_TRACE_EVENTS,
-  INFRA_EVENTS, INFRA_PROCESS_EVENTS,
+  APM_EVENTS,
+  INFRA_EVENTS,
   METRIC_EVENTS,
   WHERE_METRIC_APM,
 } from '../shared/constants'

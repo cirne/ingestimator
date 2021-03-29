@@ -53,3 +53,21 @@ table.ingestimator-table {
     margin-bottom: 0.5em;
   }
 }
+
+.header {
+  margin: 12px;
+  display: flex;
+  align-items: center;
+
+  .spacer {
+    flex-grow: 1
+  }
+}
+
+.header > * {
+  margin-right: 12px;
+}
+
+.border-top {
+  border-top: 1px solid #ddd;
+}

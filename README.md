@@ -77,6 +77,7 @@ over a 30 day period based on the time range you specify.
 
 There is a link to the official month to date data usage report at the bottom of this screen, or you
 can also view that report at any time from your user dropdown menu:
+
 ![User Menu](https://p222.p4.n0.cdn.getcloudapp.com/items/WnuY4Yb7/ad4c746d-c649-4519-b070-a5ff247ebc69.jpg?v=942f6b5a43c90d43b83debd0c4fe0a7b)
 
-Note that this data, while precise, will unfortunately not break down with the same level of detail or organized as intuitively as the data reported by **Ingestimator**. That's why I wrote this app.
+Note that the data in this report, while precise, will unfortunately not break down with the same level of detail or organized as intuitively as the data reported by **Ingestimator**. That's why I wrote this app.

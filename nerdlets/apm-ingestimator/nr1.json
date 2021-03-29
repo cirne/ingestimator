@@ -1,0 +1,12 @@
+{
+  "schemaType": "NERDLET",
+  "id": "apm-ingestimator",
+  "displayName": "Ingestimator",
+  "entities": [
+    {
+      "domain": "APM",
+      "type": "APPLICATION"
+    }
+  ],
+  "description": "Estimate the data ingest for this application"
+}
