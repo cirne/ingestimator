@@ -33,7 +33,7 @@ export default class ApmIngestimator extends React.PureComponent {
 
         return <div className="apm-ingestimator">
           <div className="header">
-            <h2 className="spacer">Data Ingest Estimates</h2>
+            <h3 className="spacer">Data Ingest Estimates</h3>
             {this.renderEsimatedCost(hostCount)}
             {this.renderPlotDropdown()}
           </div>
@@ -151,8 +151,8 @@ export default class ApmIngestimator extends React.PureComponent {
     const { accountId, timeRange } = this.props
     const { rate } = this.state
     let query = `SELECT ${select} ` +
-      `FROM ${from} ${this.getWhere()}` +
-      `${timeRange} TIMESERIES`
+      `FROM ${from} ${this.getWhere()} ` +
+      `${timeRange} TIMESERIES AUTO`
 
     if (where) {
       query = query + ` WHERE ${where}`

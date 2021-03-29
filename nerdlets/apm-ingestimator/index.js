@@ -10,10 +10,10 @@ export default class ApmIngestimatorNerdlet extends React.Component {
       {(nerdletState) => (
         <PlatformStateContext.Consumer>
           {(platformState) => {
-            const { timeRange, accountId } = platformState
+            const { accountId } = platformState
             const { entityGuid } = nerdletState
 
-            return <ApmIngestimator accountId={accountId} timeRange={timeRangeToNrql(timeRange)} entityGuid={entityGuid} />
+            return <ApmIngestimator accountId={accountId} timeRange={timeRangeToNrql(platformState)} entityGuid={entityGuid} />
           }}
         </PlatformStateContext.Consumer>
       )}

@@ -54,7 +54,7 @@ will use in caluclating ingest costs.
 Here is an estimate of monthly ingest for metric data that comes from our APM agents:
 
 ```
-FROM Metric SELECT rate(bytecountestimate(), 1 month) WHERE newrelic.source = 'metricAPI' SINCE 1 day ago RAW
+FROM Metric SELECT rate(bytecountestimate(), 1 month) WHERE newrelic.source = 'agent' SINCE 1 day ago RAW
 ```
 
 **Infrastructure**: New Relic infrastructure agents report Infrastructure
