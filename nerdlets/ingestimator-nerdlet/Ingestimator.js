@@ -33,13 +33,13 @@ export default class Ingestimator extends React.PureComponent {
     await this.setState({ loading: true, step: 0 })
 
     const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", from: METRIC_EVENTS, where: WHERE_METRIC_APM })
-    const apmEventsIngest = consumptionIngest.ApmEventsBytes
-    const apmTraceIngest = consumptionIngest.TracingBytes
+    const apmEventsIngest = consumptionIngest.ApmEventsBytes || 0
+    const apmTraceIngest = consumptionIngest.TracingBytes || 0
     const totalApmIngest = apmEventsIngest + apmMetricsIngest + apmTraceIngest
     const apmHostCount = await this.querySingleValue({ title: "APM Hosts", select: 'uniqueCount(host)', from: APM_EVENTS[0] })
 
-    const infraIngest = consumptionIngest.InfraHostBytes
-    const infraProcessIngest = consumptionIngest.InfraProcessBytes
+    const infraIngest = consumptionIngest.InfraHostBytes || 0
+    const infraProcessIngest = consumptionIngest.InfraProcessBytes || 0
     const totalInfraIngest = infraIngest + infraProcessIngest
     const infraHostCount = await this.querySingleValue({ title: "Infra Hosts", select: 'uniqueCount(hostname)', from: INFRA_EVENTS[0] })
 
