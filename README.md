@@ -27,6 +27,12 @@ We recommend you use Last 7 days to account for weekend seasonality, but if your
 a lot recently due to the addition (or removal) of more telemetry sources - or
 if you want a faster result - you can select a shorter timeframe.
 
+## Screenshot
+<p align="center">
+  <img src="https://p222.p4.n0.cdn.getcloudapp.com/items/geubJZL6/b3787189-2bff-433e-863f-c7eb200272cd.jpg?v=f7a9def7e92bcad853a6cdbf00470220"/>
+  <em>Example report from an existing New Relic customer.</em>
+</p>
+
 ## How it works
 NRQL has a special function, `bytecountestimate()`, which estimates the number of bytes of data ingest New Relic
 would record for the set of Event or Metric data queried. So for example, the following query would estimate
