@@ -1,5 +1,5 @@
 import React from 'react'
-import { logger } from 'nr1'
+import { logger, Link, navigation } from 'nr1'
 import {
   APM_EVENTS, APM_TRACE_EVENTS,
   INFRA_EVENTS, INFRA_PROCESS_EVENTS,
@@ -10,7 +10,7 @@ import {
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
 import { Loading } from './Loading'
 
-const STEP_COUNT = 8
+const STEP_COUNT = 4
 export default class Ingestimator extends React.PureComponent {
 
   state = { loading: "true", step: 0 }
@@ -33,28 +33,29 @@ export default class Ingestimator extends React.PureComponent {
     await this.setState({ loading: true, step: 0 })
 
     const apmMetricsIngest = await this.querySingleValue({ title: "APM Metrics", from: METRIC_EVENTS, where: WHERE_METRIC_APM })
-    const apmEventsIngest = await this.querySingleValue({ title: "APM Events", from: APM_EVENTS })
-    const apmTraceIngest = await this.querySingleValue({ title: "APM Traces", from: APM_TRACE_EVENTS })
+    const apmEventsIngest = consumptionIngest.ApmEventsBytes
+    const apmTraceIngest = consumptionIngest.TracingBytes
     const totalApmIngest = apmEventsIngest + apmMetricsIngest + apmTraceIngest
     const apmHostCount = await this.querySingleValue({ title: "APM Hosts", select: 'uniqueCount(host)', from: APM_EVENTS[0] })
 
-    const infraIngest = await this.querySingleValue({ title: "Infra", from: INFRA_EVENTS })
-    const infraProcessIngest = await this.querySingleValue({ title: "Infra Process", from: INFRA_PROCESS_EVENTS })
+    const infraIngest = consumptionIngest.InfraHostBytes
+    const infraProcessIngest = consumptionIngest.InfraProcessBytes
     const totalInfraIngest = infraIngest + infraProcessIngest
     const infraHostCount = await this.querySingleValue({ title: "Infra Hosts", select: 'uniqueCount(hostname)', from: INFRA_EVENTS[0] })
 
     const mobileIngest = consumptionIngest.MobileBytes || 0
     const browserIngest = consumptionIngest.BrowserBytes || 0
     const logsIngest = consumptionIngest.LoggingBytes || 0
+    const infraIntegrationIngest = consumptionIngest.InfraIntegrationBytes || 0
     const otherMetricsIngest = Math.max(0, (consumptionIngest.MetricsBytes || 0) - apmMetricsIngest)
     const allIngest = consumptionIngest.TotalBytes
-    const otherIngest = Math.max(0, allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - logsIngest - otherMetricsIngest)
+    const otherIngest = Math.max(0, allIngest - totalApmIngest - totalInfraIngest - mobileIngest - browserIngest - infraIntegrationIngest - logsIngest - otherMetricsIngest)
 
     this.setState({
       apmMetricsIngest, apmEventsIngest, apmTraceIngest, totalApmIngest,
       infraIngest, infraProcessIngest, totalInfraIngest,
       apmHostCount, infraHostCount,
-      mobileIngest, browserIngest, logsIngest, otherMetricsIngest,
+      mobileIngest, browserIngest, logsIngest, otherMetricsIngest, infraIntegrationIngest,
       otherIngest, allIngest,
       loading: false
     })
@@ -65,7 +66,6 @@ export default class Ingestimator extends React.PureComponent {
 
     try {
       const { accountId, since } = this.props
-      logger.log("Get Value", select || "Ingest Rate", from)
       const value = await getValue({ select, from, where, accountId, since })
       logger.log("Get Value", select || "Ingest Rate", from, value)
       return value
@@ -88,7 +88,7 @@ export default class Ingestimator extends React.PureComponent {
         <thead>
           <tr>
             <th colSpan={2}>Category</th>
-            <th>Data Ingest per Month</th>
+            <th>Estimated Ingest per Month</th>
             <th>Estimated Cost per Month</th>
           </tr>
         </thead>
@@ -117,11 +117,17 @@ export default class Ingestimator extends React.PureComponent {
           <IngestRow className="section" sectionTitle="Mobile" ingest={this.state.mobileIngest} />
           <IngestRow className="section" sectionTitle="Browser" ingest={this.state.browserIngest} />
           <IngestRow className="section" sectionTitle="Logs" ingest={this.state.logsIngest} />
+          <IngestRow className="section" sectionTitle="Infra Integrations" ingest={this.state.infraIntegrationIngest} />
           <IngestRow className="section" sectionTitle="Metrics (non APM/Infra)" ingest={this.state.otherMetricsIngest} />
           <IngestRow className="section" sectionTitle="All Other Ingest" ingest={this.state.otherIngest} />
           <IngestRow className="grandTotal" sectionTitle="Grand Total Ingest" ingest={this.state.allIngest} />
         </tbody>
       </table>
+      <div className="footer">
+        <Link onClick={() => navigation.openStackedNerdlet({ id: 'usage-ui.home' })}>
+          Show offical month-to-date data usage
+        </Link>
+      </div>
     </div>
   }
 }
@@ -134,8 +140,6 @@ function IngestRow({ sectionTitle, title, ingest, hostCount, className }) {
     <td className="right">{estimatedCost(ingest, hostCount)}</td>
   </tr>
 }
-
-
 
 function ClampedTimeRangeNotification({ since, metricsIngest }) {
   return <div className="notice">
