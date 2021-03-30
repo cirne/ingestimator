@@ -20,6 +20,11 @@ export default class ApplicationTable extends React.PureComponent {
     }
   }
 
+  /**
+   * need to run 2 separate queries: one for the Metrics data, the other for the
+   * events data. Then sum up events and metrics data per app and compile into
+   * an array for rendering.
+   */
   async load() {
     this.setState({ loading: true })
 
@@ -75,10 +80,10 @@ export default class ApplicationTable extends React.PureComponent {
     return <div className="details">
       <table className="ingestimator-table">
         <thead>
-          <th>Application</th>
-          <th>Ingest</th>
-          <th>Cost</th>
-          <th>Per Host</th>
+          <th>Top Applications</th>
+          <th className="right">Ingest</th>
+          <th className="right">Cost</th>
+          <th className="right">Per Host</th>
         </thead>
         <tbody>
           {apps.map(app => (

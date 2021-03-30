@@ -4,8 +4,12 @@ table {
       font-weight: 800;
       text-transform: none;
       background-color: #e8e8e8;
+    }    
+    th.right {
+      text-align: right;
     }
   }
+  
   tbody {
     td {
       padding: 4px 8px;
@@ -14,6 +18,7 @@ table {
     td.right {
       text-align: right;
     }
+
 
     td.title {
       font-weight: 500;

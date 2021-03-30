@@ -81,8 +81,8 @@ export default class Ingestimator extends React.PureComponent {
         <thead>
           <tr>
             <th colSpan={2}>Category</th>
-            <th>Estimated Ingest</th>
-            <th>Estimated Cost</th>
+            <th className="right">Estimated Ingest</th>
+            <th className="right">Estimated Cost</th>
           </tr>
         </thead>
         <tbody>

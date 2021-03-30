@@ -6,7 +6,8 @@ import { Loading } from './Loading'
 
 export default function NrConsumptionQuery({ since, accountId }) {
   const query = `FROM NrConsumption SELECT rate(sum(GigabytesIngested), 1 month) ` +
-    `WHERE productLine = 'DataPlatform' FACET usageMetric SINCE ${since} LIMIT 20`
+    `WHERE productLine = 'DataPlatform' AND consumingAccountId = ${accountId}` +
+    `FACET usageMetric SINCE ${since} LIMIT 20`
 
   return <NrqlQuery accountId={accountId} query={query} formatType="raw">
     {({ loading, data }) => {
