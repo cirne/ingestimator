@@ -1,4 +1,6 @@
-import { NrqlQuery } from 'nr1'
+import { NrqlQuery, Grid, GridItem } from 'nr1'
+import { ingestRate } from '../shared/utils'
+import ApplicationTable from './ApplicationTable'
 import Ingestimator from './Ingestimator'
 import { Loading } from './Loading'
 
@@ -20,13 +22,43 @@ export default function NrConsumptionQuery({ since, accountId }) {
         clampedTimeRange = true
       }
 
-      return <Ingestimator
-        consumptionIngest={consumptionIngest}
-        accountId={accountId}
-        clampedTimeRange={clampedTimeRange}
-        since={since} />
+      return <div>
+        <ClampedTimeRangeNotification
+          visible={clampedTimeRange}
+          since={since}
+          metricsIngest={consumptionIngest.MetricsBytes} />
+        <Grid>
+          <GridItem columnSpan={7}>
+            <Ingestimator
+              consumptionIngest={consumptionIngest}
+              accountId={accountId}
+              clampedTimeRange={clampedTimeRange}
+              since={since} />
+          </GridItem>
+          <GridItem columnSpan={5}>
+            <ApplicationTable accountId={accountId} since={since} />
+          </GridItem>
+        </Grid>
+      </div>
     }}
   </NrqlQuery>
 }
 
 
+function ClampedTimeRangeNotification({ visible, since, metricsIngest }) {
+  if (!visible) return ""
+
+  return <div className="notice">
+    <h3>Shortened Time Range</h3>
+    <p>
+      In order to estimate APM Metrics Ingest, <strong>Ingestimator</strong> must inspect
+      every byte of metric data ingested in your account over the specified time range.
+    </p><p>
+      This account has an estimated monthly metrics ingest of {ingestRate(metricsIngest)}, which is too
+      much to analyze over very long time ranges.
+    </p><p>
+      As a result, the time range used to estimate your APM ingest rate is extrapolated
+      from telemetry ingested since {since}.
+    </p>
+  </div>
+}

@@ -20,7 +20,7 @@ export default class ApmIngestimator extends React.PureComponent {
 
   render() {
     const { rate } = this.state
-    const { accountId, timeRange } = this.props
+    const { accountId, timeRange, appName } = this.props
 
     const hostCount = `SELECT uniqueCount(host) FROM Transaction ${timeRange} ${this.getWhere()}`
     return <NrqlQuery accountId={accountId} query={hostCount} formatType="raw">
@@ -33,7 +33,7 @@ export default class ApmIngestimator extends React.PureComponent {
 
         return <div className="apm-ingestimator">
           <div className="header">
-            <h3 className="spacer">Data Ingest Estimates</h3>
+            <h3 className="spacer">{appName || "Data Ingest Estimates"}</h3>
             {this.renderEsimatedCost(hostCount)}
             {this.renderPlotDropdown()}
           </div>
@@ -137,7 +137,7 @@ export default class ApmIngestimator extends React.PureComponent {
     const { rate } = this.state
     return <>
       <span>Plot: </span>
-      <Dropdown title={`Estimated Ingest rate per ${rate}`}>
+      <Dropdown title={`Ingest rate per ${rate}`}>
         {items.map(item => (
           <DropdownItem key={item} onClick={() => this.setState({ rate: item })}>
             Ingest rate per {item}

@@ -1,4 +1,4 @@
-table.ingestimator-table {
+table {
   thead {
     th {
       font-weight: 800;
@@ -7,6 +7,10 @@ table.ingestimator-table {
     }
   }
   tbody {
+    td {
+      padding: 4px 8px;
+    }
+
     td.right {
       text-align: right;
     }
@@ -37,17 +41,14 @@ table.ingestimator-table {
         background-color: #e8e8e8;
       }
     }
-
   }
 }
 
 .notice {
-  width: 90%;
-  border: 1px solid #00F;
-  background-color: #f0f8ff;
+  border: 1px solid #08F;
+  background-color: #f4faff;
   padding: 12px;
-  margin-bottom: 12px;
-
+  margin: 12px;
 
   h3,p {
     margin-bottom: 0.5em;

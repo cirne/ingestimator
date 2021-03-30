@@ -20,7 +20,11 @@ export async function getValue({ select, from, where, accountId, since }) {
   }
 
 
-  return Object.values(result.data.results[0])[0] || 0
+  return getResultValue(result.data.results[0]) || 0
+}
+
+export function getResultValue(result) {
+  return Object.values(result)[0]
 }
 
 

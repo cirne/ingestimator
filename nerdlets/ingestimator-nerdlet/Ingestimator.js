@@ -1,12 +1,7 @@
 import React from 'react'
 import { logger, Link, navigation } from 'nr1'
-import {
-  APM_EVENTS,
-  INFRA_EVENTS,
-  METRIC_EVENTS,
-  WHERE_METRIC_APM,
-} from '../shared/constants'
 
+import { APM_EVENTS, INFRA_EVENTS, METRIC_EVENTS, WHERE_METRIC_APM } from '../shared/constants'
 import { getValue, ingestRate, estimatedCost } from '../shared/utils'
 import { Loading } from './Loading'
 
@@ -81,15 +76,13 @@ export default class Ingestimator extends React.PureComponent {
     const percentDone = Math.round(step * 100 / STEP_COUNT)
     if (loading) return <Loading percentDone={percentDone} stage={stage} />
 
-    const { clampedTimeRange, since, consumptionIngest } = this.props
     return <div className="ingestimator">
-      {clampedTimeRange && <ClampedTimeRangeNotification since={since} metricsIngest={consumptionIngest.MetricsBytes} />}
       <table className="ingestimator-table">
         <thead>
           <tr>
             <th colSpan={2}>Category</th>
-            <th>Estimated Ingest per Month</th>
-            <th>Estimated Cost per Month</th>
+            <th>Estimated Ingest</th>
+            <th>Estimated Cost</th>
           </tr>
         </thead>
         <tbody>
@@ -141,18 +134,3 @@ function IngestRow({ sectionTitle, title, ingest, hostCount, className }) {
   </tr>
 }
 
-function ClampedTimeRangeNotification({ since, metricsIngest }) {
-  return <div className="notice">
-    <h3>Shortened Time Range</h3>
-    <p>
-      In order to estimate APM Metrics Ingest, <strong>Ingestimator</strong> must inspect
-      every byte of metric data ingested in your account over the specified time range.
-    </p><p>
-      This account has an estimated monthly metrics ingest of {ingestRate(metricsIngest)}, which is too
-      much to analyze over very long time ranges.
-    </p><p>
-      As a result, the time range used to estimate your APM ingest rate is extrapolated
-      from telemetry ingested since {since}.
-    </p>
-  </div>
-}

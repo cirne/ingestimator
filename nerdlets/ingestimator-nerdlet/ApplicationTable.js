@@ -1,0 +1,110 @@
+import React from "react"
+import { NrqlQuery, Spinner, Link, navigation } from 'nr1'
+
+import { APM_EVENTS, APM_TRACE_EVENTS, ESTIMATED_INGEST_GB, METRIC_EVENTS, WHERE_METRIC_APM } from "../shared/constants"
+import { estimatedCost, getResultValue, ingestRate } from "../shared/utils"
+
+export default class ApplicationTable extends React.PureComponent {
+  state = { loading: true }
+
+  async componentDidMount() {
+    this.load()
+  }
+
+  async componentDidUpdate({ accountId, since }) {
+    if (!accountId || !since) {
+      this.setState({ loading: true })
+    }
+    else if (accountId != this.props.accountId || since != this.props.since) {
+      await this.load()
+    }
+  }
+
+  async load() {
+    this.setState({ loading: true })
+
+    const { accountId, since } = this.props
+    function getQuery(select, from, where, facet) {
+      let query = `SELECT ${select} FROM ${from} FACET ${facet || 'entityGuid'} SINCE ${since} LIMIT 30`
+      if (where) query = query + ` WHERE ${where}`
+      return query
+    }
+
+    const eventSelect = [
+      ESTIMATED_INGEST_GB,
+      'latest(appName OR service.name)',
+      'uniqueCount(host)'
+    ]
+    const eventsQuery = getQuery(eventSelect, APM_EVENTS.concat(APM_TRACE_EVENTS))
+    const metricsQuery = getQuery(ESTIMATED_INGEST_GB, METRIC_EVENTS, WHERE_METRIC_APM, 'entity.guid')
+
+    const eventsResult = await NrqlQuery.query({ accountId, query: eventsQuery, formatType: 'raw' })
+    const metricsResult = await NrqlQuery.query({ accountId, query: metricsQuery, formatType: 'raw' })
+
+    const apps = {}
+    eventsResult.data.facets.forEach(({ name, results }) => {
+      apps[name] = {
+        entityGuid: name,
+        eventsIngest: getResultValue(results[0]),
+        appName: getResultValue(results[1]),
+        hostCount: getResultValue(results[2]),
+        totalIngest: getResultValue(results[0])
+      }
+    })
+    metricsResult.data.facets.forEach(({ name, results }) => {
+      const app = apps[name]
+      if (app) {
+        app.metricsIngest = getResultValue(results[0])
+        app.totalIngest = app.metricsIngest + app.eventsIngest
+      }
+    })
+
+    const appsList = Object.values(apps)
+      .filter(app => app.totalIngest)
+      .sort((y, x) => x.totalIngest - y.totalIngest)
+
+    this.setState({
+      apps: appsList,
+      loading: false
+    })
+  }
+
+  render() {
+    const { loading, apps } = this.state
+    if (loading) return <Spinner />
+    return <div className="details">
+      <table className="ingestimator-table">
+        <thead>
+          <th>Application</th>
+          <th>Ingest</th>
+          <th>Cost</th>
+          <th>Per Host</th>
+        </thead>
+        <tbody>
+          {apps.map(app => (
+            <tr key={app.entityGuid}>
+              <td><AppLink {...app} /></td>
+              <td className="right">{ingestRate(app.totalIngest)}</td>
+              <td className="right">{estimatedCost(app.totalIngest)}</td>
+              <td className="right">{estimatedCost(app.totalIngest, app.hostCount)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+function AppLink({ entityGuid, appName }) {
+  const url = navigation.getOpenStackedNerdletLocation({
+    id: 'apm-ingestimator',
+    urlState: {
+      entityGuid,
+      appName
+    }
+
+  })
+  return <Link to={url}>
+    {appName || entityGuid}
+  </Link>
+}
