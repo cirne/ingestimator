@@ -12,7 +12,7 @@ export const ESTIMATED_INGEST_GB = `rate(bytecountestimate(), 1 month)/1e9`
 
 // where clauses for metrics queries
 export const WHERE_METRIC_API = "newrelic.source = 'metricAPI'"
-export const WHERE_OTHER_METRIC = "newrelic.source != 'agent'"
+export const WHERE_OTHER_METRIC = "newrelic.source != 'agent' AND agent.type = 'apm'"
 export const WHERE_METRIC_APM = "newrelic.source = 'agent'"
 
 // where clauses for NrConsumption queries

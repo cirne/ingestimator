@@ -80,10 +80,12 @@ export default class ApplicationTable extends React.PureComponent {
     return <div className="details">
       <table className="ingestimator-table">
         <thead>
-          <th>Top Applications</th>
-          <th className="right">Ingest</th>
-          <th className="right">Cost</th>
-          <th className="right">Per Host</th>
+          <tr>
+            <th>Top Applications</th>
+            <th className="right">Ingest</th>
+            <th className="right">Cost</th>
+            <th className="right">Per Host</th>
+          </tr>
         </thead>
         <tbody>
           {apps.map(app => (

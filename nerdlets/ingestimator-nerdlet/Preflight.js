@@ -4,7 +4,7 @@ import ApplicationTable from './ApplicationTable'
 import Ingestimator from './Ingestimator'
 import { Loading } from './Loading'
 
-export default function NrConsumptionQuery({ since, accountId }) {
+export default function Preflight({ since, accountId }) {
   const query = `FROM NrConsumption SELECT rate(sum(GigabytesIngested), 1 month) ` +
     `WHERE productLine = 'DataPlatform' AND consumingAccountId = ${accountId}` +
     `FACET usageMetric SINCE ${since} LIMIT 20`

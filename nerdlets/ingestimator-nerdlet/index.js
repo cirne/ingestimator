@@ -29,7 +29,7 @@ export default class IngestimatorNerdlet extends React.Component {
             }
 
             const since = `${timeRange.duration / HOUR} hours ago`
-            return <Preflight accountId={accountId} since={since} />
+            return <Preflight accountId={parseInt(accountId)} since={since} />
           }}
         </PlatformStateContext.Consumer>
       )}
