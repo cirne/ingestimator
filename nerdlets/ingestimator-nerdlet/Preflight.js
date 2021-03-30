@@ -1,6 +1,6 @@
 import { NrqlQuery, Grid, GridItem } from 'nr1'
 import { ingestRate } from '../shared/utils'
-import ApplicationTable from './ApplicationTable'
+import Details from './Details'
 import Ingestimator from './Ingestimator'
 import { Loading } from './Loading'
 
@@ -29,15 +29,15 @@ export default function Preflight({ since, accountId }) {
           since={since}
           metricsIngest={consumptionIngest.MetricsBytes} />
         <Grid>
-          <GridItem columnSpan={7}>
+          <GridItem columnSpan={6}>
             <Ingestimator
               consumptionIngest={consumptionIngest}
               accountId={accountId}
               clampedTimeRange={clampedTimeRange}
               since={since} />
           </GridItem>
-          <GridItem columnSpan={5}>
-            <ApplicationTable accountId={accountId} since={since} />
+          <GridItem columnSpan={6}>
+            <Details accountId={accountId} since={since} />
           </GridItem>
         </Grid>
       </div>

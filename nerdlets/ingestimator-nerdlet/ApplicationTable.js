@@ -4,6 +4,7 @@ import { NrqlQuery, Spinner, Link, Icon, navigation } from 'nr1'
 import { APM_EVENTS, APM_TRACE_EVENTS, ESTIMATED_INGEST_GB, METRIC_EVENTS, WHERE_METRIC_APM } from "../shared/constants"
 import { estimatedCost, getResultValue, ingestRate } from "../shared/utils"
 
+const LIMIT = 20
 export default class ApplicationTable extends React.PureComponent {
   state = { loading: true }
 
@@ -30,7 +31,7 @@ export default class ApplicationTable extends React.PureComponent {
 
     const { accountId, since } = this.props
     function getQuery(select, from, where, facet) {
-      let query = `SELECT ${select} FROM ${from} FACET ${facet || 'entityGuid'} SINCE ${since} LIMIT 30`
+      let query = `SELECT ${select} FROM ${from} FACET ${facet || 'entityGuid'} SINCE ${since} LIMIT ${LIMIT}`
       if (where) query = query + ` WHERE ${where}`
       return query
     }
@@ -77,8 +78,9 @@ export default class ApplicationTable extends React.PureComponent {
   render() {
     const { loading, apps } = this.state
     if (loading) return <Spinner />
-    return <div className="details">
-      <table className="ingestimator-table">
+    return <div className="applications-table">
+      <h4>Top Applications by Telemetry Ingest</h4>
+      <table >
         <thead>
           <tr>
             <th>Top Applications</th>

@@ -9,7 +9,7 @@ table {
       text-align: right;
     }
   }
-  
+
   tbody {
     td {
       padding: 4px 8px;
@@ -54,10 +54,6 @@ table {
   background-color: #f4faff;
   padding: 12px;
   margin: 12px;
-
-  h3,p {
-    margin-bottom: 0.5em;
-  }
 }
 
 .header {
@@ -76,4 +72,8 @@ table {
 
 .border-top {
   border-top: 1px solid #ddd;
+}
+
+h1,h2,h3,h4,p {
+  margin-bottom: 0.5em;
 }
