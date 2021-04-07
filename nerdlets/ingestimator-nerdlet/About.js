@@ -11,7 +11,7 @@ export default function About() {
       New Relic Telemetry Data platform prices based on ingested telemetry data at
       25c per gigabyte, with the first 100GB free. But it's often hard to come up with
       an estimated cost to manage a specific application, since each applicaiton generates
-      a variable amount of telemetry bsaed on a number of factors.
+      a variable amount of telemetry based on a number of factors.
     </p><p>
       Select an account in the account picker, and pick a time range. Estimator will
       inspect all of your ingested telemetry over the specified time range, and then
@@ -23,7 +23,7 @@ export default function About() {
       cost per host for APM and Infrastructure.
     </p><p>
       Ingestimator is provided as an open source new relic one application.
-      you can learn more about how it works, or make contributes, by viewing
+      you can learn more about how it works, or make contributions, by viewing
       its repository on <Link to="https://github.com/cirne/ingestimator">Github</Link>.
     </p>
   </div>
