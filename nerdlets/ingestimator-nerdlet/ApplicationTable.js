@@ -86,6 +86,7 @@ export default class ApplicationTable extends React.PureComponent {
             <th>Top Applications</th>
             <th className="right">Ingest</th>
             <th className="right">Cost</th>
+            <th className="right"># Hosts</th>
             <th className="right">Per Host</th>
           </tr>
         </thead>
@@ -95,6 +96,7 @@ export default class ApplicationTable extends React.PureComponent {
               <td><AppLink {...app} /></td>
               <td className="right">{ingestRate(app.totalIngest)}</td>
               <td className="right">{estimatedCost(app.totalIngest)}</td>
+              <td className="right">{app.hostCount}</td>
               <td className="right">{estimatedCost(app.totalIngest, app.hostCount)}</td>
             </tr>
           ))}

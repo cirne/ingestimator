@@ -38,8 +38,8 @@ export default class Ingestimator extends React.PureComponent {
     const totalInfraIngest = infraIngest + infraProcessIngest
     const infraHostCount = await this.querySingleValue({ title: "Infra Hosts", select: 'uniqueCount(hostname)', from: INFRA_EVENTS[0] })
 
-    const mobileIngest = consumptionIngest.MobileBytes || 0
-    const browserIngest = consumptionIngest.BrowserBytes || 0
+    const mobileIngest = consumptionIngest.MobileEventsBytes || 0
+    const browserIngest = consumptionIngest.BrowserEventsBytes || 0
     const logsIngest = consumptionIngest.LoggingBytes || 0
     const infraIntegrationIngest = consumptionIngest.InfraIntegrationBytes || 0
     const otherMetricsIngest = Math.max(0, (consumptionIngest.MetricsBytes || 0) - apmMetricsIngest)
