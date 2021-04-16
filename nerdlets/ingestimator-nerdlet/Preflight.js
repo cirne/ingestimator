@@ -18,7 +18,7 @@ export default function Preflight({ since, accountId }) {
       })
 
       let clampedTimeRange = false
-      if (consumptionIngest.MetricsBytes > 500000) {
+      if (consumptionIngest.MetricsBytes > 500000 || consumptionIngest.ApmEventsBytes > 10000) {
         since = "3 hours ago"
         clampedTimeRange = true
       }
@@ -46,20 +46,10 @@ export default function Preflight({ since, accountId }) {
 }
 
 
-function ClampedTimeRangeNotification({ visible, since, metricsIngest }) {
+function ClampedTimeRangeNotification({ visible, since }) {
   if (!visible) return ""
 
   return <div className="notice">
-    <h3>Shortened Time Range</h3>
-    <p>
-      In order to estimate APM Metrics Ingest, <strong>Ingestimator</strong> must inspect
-      every byte of metric data ingested in your account over the specified time range.
-    </p><p>
-      This account has an estimated monthly metrics ingest of {ingestRate(metricsIngest)}, which is too
-      much to analyze over very long time ranges.
-    </p><p>
-      As a result, the time range used to estimate your APM ingest rate is extrapolated
-      from telemetry ingested since {since}.
-    </p>
+    Due to high data volumes in this account, data analysis restricted to {since}.
   </div>
 }

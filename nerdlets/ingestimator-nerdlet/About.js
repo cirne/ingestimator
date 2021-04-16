@@ -17,6 +17,10 @@ export default function About() {
       inspect all of your ingested telemetry over the specified time range, and then
       project the montly cost from there.
     </p><p>
+      Ingestimator does a deep analsysis of virtually all of the data you collect
+      in an account. For accounts with large data volumes, the time range may be
+      restricted to a shorter period (for example the last 3 hours) regardless
+      of what time range you pick.
     </p><p>
       Most other solutions (including New Relic in the past) have priced APM and
       infrastructure monitoring by the host, so this tool also reports the estimated
