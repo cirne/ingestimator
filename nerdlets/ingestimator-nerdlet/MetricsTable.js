@@ -1,7 +1,7 @@
 import React from "react"
 import { NrqlQuery, Spinner, Link, Icon, navigation } from 'nr1'
 
-import { APM_EVENTS, APM_TRACE_EVENTS, ESTIMATED_INGEST_GB, METRIC_EVENTS, WHERE_METRIC_APM } from "../shared/constants"
+import { ESTIMATED_INGEST_GB, METRIC_EVENTS } from "../shared/constants"
 import { estimatedCost, getResultValue, ingestRate } from "../shared/utils"
 
 const LIMIT = 40
