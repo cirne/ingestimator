@@ -48,7 +48,7 @@ FROM Metric SELECT bytecountestimate() SINCE 1 day ago RAW
 ```
 
 Note that RAW statement is used to include all of the raw metric data that is ingested prior to aggregation
-into a (query optimized) `Metric` data point, since that is effectively the ingested data that New Relic
+into a (query optimized) `Metric` data point, since the raw data is effectively the ingested data that New Relic
 will use in caluclating ingest costs.
 
 Here is an estimate of monthly ingest for metric data that comes from our APM agents:
