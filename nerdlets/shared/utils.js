@@ -35,17 +35,29 @@ export function ingestRate(value, hostCount) {
   return `${gigabytes(value)} /mo`
 }
 
+function tdpCost(value) {
+  return Math.round(value * 25) / 100;
+}
+
 export function estimatedCost(value, hostCount) {
   const suffix = "/mo"
   if (hostCount && hostCount > 0) {
     value = value / hostCount
   }
-  const cost = Math.round(value * 25) / 100
+  const cost = tdpCost(value)
   const dollars = cost.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
   return `${dollars} ${suffix}`
 }
 
+export function potentialSavings(ineffectivePercentage, basisValue) {
+  const suffix = "/mo"
+  const ineffectiveGBs = (ineffectivePercentage / 100) * basisValue
+  const ineffectiveTdpCost = tdpCost(ineffectiveGBs)
+  const dollars = ineffectiveTdpCost.toLocaleString("en-US", { style: "currency", currency: "USD" })
+
+  return `${dollars} ${suffix}`
+}
 
 export function gigabytes(value, isDelta) {
   value = value * 1e9

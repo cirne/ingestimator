@@ -9,6 +9,7 @@ export const METRIC_EVENTS = ['Metric', 'MetricRaw']
 
 // select clausess
 export const ESTIMATED_INGEST_GB = `rate(bytecountestimate(), 1 month)/1e9`
+export const INEFFECTIVE_METRICS_PERCENTAGE = `percentage(count(*), where (%[type]='summary' and %[count]=0) or (%[type]='gauge' and %[count]=1 and %[latest]=0))`
 
 // where clauses for metrics queries
 export const WHERE_METRIC_API = "newrelic.source = 'metricAPI'"
