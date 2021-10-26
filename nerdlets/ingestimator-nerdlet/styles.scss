@@ -27,8 +27,10 @@
 }
 
 .applications-table {
-  width: 100%;
   margin: 12px;
+  table {
+    width: 100%;
+  }
 }
 
 .about {
